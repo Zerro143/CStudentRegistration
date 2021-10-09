@@ -1,2 +1,1 @@
-# CStudentRegistration
-Simple C Project todo
+# Student Registration Program in C Language
