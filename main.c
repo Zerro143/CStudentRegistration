@@ -1,5 +1,230 @@
 #include<stdio.h>
-void main()
+#include<stdlib.h>
+#include<string.h>
+
+/************************************************************
+Function Name: fill_students
+Purpose: Fill Each Student's data in students list on init.
+Function in parameters: int[size], int
+Function out parameters: void
+Version: 1
+Author: 
+*************************************************************/
+void fill_students(int *students, int size)
 {
+    int row_counter, malloc_size;
+
+    for(row_counter=0;row_counter<size;row_counter++)
+    {
+        printf("Please enter student ID for student %d: ", row_counter+1);
+        scanf("%d", &students[row_counter]);    
+    }
+}
+
+/************************************************************
+Function Name: fill_courses
+Purpose: Fill Each Course's code in courses list on init.
+Function in parameters: char[size][8], int
+Function out parameters: void
+Version: 1
+Author: 
+*************************************************************/
+void fill_courses(char **courses, int size)
+{
+    int course_index, malloc_size;
     
+    malloc_size = sizeof(char) * 8;
+    for(course_index=0;course_index<size;course_index++)
+    {
+        courses[course_index] = malloc(malloc_size);
+        printf("Please enter course code for course %d: ", course_index+1);
+        scanf("%s", courses[course_index]);
+    }
+}
+
+/************************************************************
+Function Name: fill_registration
+Purpose: Create an empty registration list directly on startup.
+Function in parameters: int[n][3], int, int
+Function out parameters: void
+Version: 1
+Author: 
+*************************************************************/
+void fill_registration(int **registration, int student_count, int course_count)
+{
+    int row_counter, student_index, course_index, malloc_size;
+    row_counter = 0;
+    malloc_size = sizeof(int) * 3;
+    for(student_index=0;student_index<student_count;student_index++)
+        for(course_index=0;course_index<course_count;course_index++)
+        {
+            registration[row_counter] = malloc(malloc_size);
+            registration[row_counter][0] = student_index;
+            registration[row_counter][1] = course_index;
+            registration[row_counter][2] = 0;
+            row_counter++;
+        }
+}
+
+/************************************************************
+Function Name: menu
+Purpose: Show menu and take user's choice.
+Function in parameters: void
+Function out parameters: int
+Version: 1
+Author: 
+*************************************************************/
+int menu()
+{
+    char choice;
+    printf("Please choose one of the following actions:\n");
+    printf("1- Register a student in a course\n");
+    printf("2- Drop a student's course\n");
+    printf("3- Print registration table\n");
+    printf("4- Quit\n");
+    printf("Please enter action number: ");
+    
+    scanf("\n%c", &choice);
+    return choice;
+}
+
+/************************************************************
+Function Name: register_modify
+Purpose: Enroll/Drop Student from a course by setting its value.
+Function in parameters: int[n], char[m][8], int[nxm][3], int, int
+Function out parameters: void
+Version: 1
+Author: 
+*************************************************************/
+void register_modify(int *students, char **courses, int **registration, int student_count, int course_count, int value)
+{
+    int studentID;
+    char courseCode[8];
+    int student_index, course_index, flag;
+    flag=1;
+    while(flag){
+        printf("Please enter student ID: ");
+        scanf("%d", &studentID);
+
+        for(student_index=0;student_index<student_count;student_index++)
+            if(studentID == students[student_index])
+            {
+                flag=0;
+                break;
+            }
+
+        if(flag)printf("Incorrect student ID: %d\n", studentID);
+        
+    }
+    
+    flag=1;
+    while(flag){
+        printf("Please enter course code: ");
+        scanf("%s", courseCode);
+
+        for(course_index=0;course_index<course_count;course_index++)
+            if(!strcmp(courseCode, courses[course_index]))
+            {
+                flag=0;
+                break;
+            }
+        if(flag)printf("Incorrect Course Code: %s\n", courseCode);
+    }
+
+    flag = student_index * course_count + course_index;  // Check if we can fetch details directly
+    if(students[registration[flag][0]] == studentID && registration[flag][1] == course_index)
+    {
+        registration[flag][2] = value;
+        print_registration(registration, student_count, course_count);
+    }
+    else printf("Try again...");
+
+}
+
+/************************************************************
+Function Name: print_registration
+Purpose: Print Registration list data only values of each student as set
+Function in parameters: int[mxn], int, int
+Function out parameters: void
+Version: 1
+Author: 
+*************************************************************/
+void print_registration(int **registration, int student_count, int course_count)
+{
+    int student_index, course_index, row_index, max;
+    row_index = 0;
+    max=student_count * course_count;
+    printf("[ ");
+    for(student_index=0;student_index<student_count;student_index++)
+    {
+        printf("[");
+        for(course_index=0;course_index<course_count;course_index++)
+        {
+            printf(" %d", registration[row_index][2]);
+            if(course_index+1 < course_count)printf(",");
+            
+            row_index++;
+        }
+        printf(" ]");
+        if(student_index+1 < student_count)printf(",");
+
+    }
+    printf(" ]\n");
+}
+
+/***************************************************************
+Function Name: main
+Purpose: Main function which runs and calls all other finctions
+Function in parameters: void
+Function out parameters: int
+Version: 1
+Author: 
+***************************************************************/
+int main()
+{
+    int *students;
+    int **registration;
+    int student_count, course_count;
+    char **courses;
+
+    // Allocating Memory and data for students
+    printf("How many students will you like to register: ");
+    scanf("%d", &student_count);
+    students = malloc(student_count * sizeof(int));
+    fill_students(students, student_count);
+    
+    // Allocating Memory and data for Courses
+    printf("How many courses are you offering: ");
+    scanf("%d", &course_count);    
+    courses = malloc(8 * course_count * sizeof(char));
+    fill_courses(courses, course_count);
+
+    // Allocating Memory and data for Registration
+    registration = malloc(3 * student_count * course_count * sizeof(int));
+    fill_registration(registration, student_count, course_count);
+
+    while(1){
+        switch (menu())
+        {
+        case '4':
+            return 0;
+        case '3':
+            print_registration(registration, student_count, course_count);
+            break;
+        case '2':
+            register_modify(students, courses, registration, student_count, course_count, 0);
+            break;
+        case '1':
+            register_modify(students, courses, registration, student_count, course_count, 1);
+            break;
+        default:
+            printf("Error Unknown action:\nTry again...\n");
+            break;
+        }
+    }
+    // Empty all the data structure
+    free(students);
+    free(courses);
+    free(registration);
+    return 0;
 }
