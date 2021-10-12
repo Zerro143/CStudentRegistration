@@ -11,7 +11,41 @@
 #include<stdlib.h>
 #include<string.h>
 
-
+/************************************************************
+Function Name: input_student
+Purpose: Check Student input.
+Function in parameters: void
+Function out parameters: int
+Version: 1
+Author: 
+*************************************************************/
+int int_input()
+{
+    char input_id[16];
+    int num = 0;
+    int isDigit = 0;
+    int j=0;
+    
+    while(1)
+    {
+        scanf("%s", input_id);
+        printf("%s\n", input_id);
+        while(j<strlen(input_id) && input_id[j] != '\0' && isDigit == 0){
+            if(input_id[j] > 57 || input_id[j] < 48)
+            {
+                isDigit = 0;
+                printf("Not a valid no...\n");
+                break;
+            }
+            else{
+                isDigit = 1;
+                num = input_id[j] - '0';
+            }
+            j++;
+        }
+        if(isDigit)return num;
+    }
+}
 
 /************************************************************
 Function Name: input_student
@@ -31,20 +65,20 @@ int input_student()
     while(1)
     {
         scanf("%s", input_id);
-        while(j<strlen(input_id) && isDigit == 0){
-            if(input_id[j] > 57 && input_id[j] < 48)
+        while(j<strlen(input_id) && input_id[j] != '\0'){
+            if(input_id[j] > 57 || input_id[j] < 48)
             {
                 isDigit = 0;
-                printf("Please Enter valid Student ID...\n");
                 break;
             }
             else{
                 isDigit = 1;
-                num = input_id[j] - '0';
+                num = num * 10 + (input_id[j] - '0');
             }
             j++;
         }
-        if(isDigit)return num;
+        if(isDigit && num > 9999)return num;
+        else printf("Please Enter valid Student ID...\n");
     }
 }
 
@@ -63,14 +97,17 @@ void input_course(char *CourseCode)
     {
         scanf("%s", CourseCode);
         for (index = 0; CourseCode[index]!='\0'; index++) {
-            if(CourseCode[index] >= 'a' && CourseCode[index] <= 'z') {
+            if(
+                (CourseCode[index] >= 'a' && CourseCode[index] <= 'z') &&
+                (CourseCode[index] >= '0' && CourseCode[index] <= '9')
+            ) {
                 isCorrect = 0;
-                printf("Please Enter valid Course Code...\n");
                 break;
             }
             else isCorrect = 1;
         }
-        if(isCorrect) return;
+        if(isCorrect && index > 6) return;
+        else printf("Please Enter valid Course Code...\n");
     }
     
 }
@@ -91,7 +128,8 @@ void fill_students(int *students, int size)
     {
         printf("Please enter student ID for student %d: ", row_counter+1);
         // scanf("%d", &students[row_counter]);  
-        students[row_counter] = input_student();  
+        students[row_counter] = input_student();
+        printf("got %d", students[row_counter]);  
     }
 }
 
@@ -211,7 +249,8 @@ void register_modify(int *students, char **courses, int **registration, int stud
     flag=1;
     while(flag){
         printf("Please enter student ID: ");
-        scanf("%d", &studentID);
+        // scanf("%d", &studentID);
+        studentID = int_input();
 
         for(student_index=0;student_index<student_count;student_index++)
             if(studentID == students[student_index])
@@ -265,13 +304,15 @@ int main()
 
     // Allocating Memory and data for students
     printf("How many students will you like to register: ");
-    scanf("%d", &student_count);
+    // scanf("%d", &student_count);
+    student_count = int_input();
     students = malloc(student_count * sizeof(int));
     fill_students(students, student_count);
     
     // Allocating Memory and data for Courses
     printf("How many courses are you offering: ");
-    scanf("%d", &course_count);    
+    // scanf("%d", &course_count);    
+    course_count = int_input();
     courses = malloc(8 * course_count * sizeof(char));
     fill_courses(courses, course_count);
 
