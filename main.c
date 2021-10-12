@@ -1,6 +1,79 @@
+/******************************************
+ * Title: dummy
+ * Course: dummy
+ * @Author: dummy
+ * Lab Section: dummy
+ * Professor: dummy
+ * Due date: dummy
+ * Submission Date: dummy
+******************************************/
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+
+
+
+/************************************************************
+Function Name: input_student
+Purpose: Check Student input.
+Function in parameters: void
+Function out parameters: int
+Version: 1
+Author: 
+*************************************************************/
+int input_student()
+{
+    char input_id[16];
+    int num = 0;
+    int isDigit = 0;
+    int j=0;
+    
+    while(1)
+    {
+        scanf("%s", input_id);
+        while(j<strlen(input_id) && isDigit == 0){
+            if(input_id[j] > 57 && input_id[j] < 48)
+            {
+                isDigit = 0;
+                printf("Please Enter valid Student ID...\n");
+                break;
+            }
+            else{
+                isDigit = 1;
+                num = input_id[j] - '0';
+            }
+            j++;
+        }
+        if(isDigit)return num;
+    }
+}
+
+/************************************************************
+Function Name: input_course
+Purpose: Check Student input.
+Function in parameters: char[8]
+Function out parameters: void
+Version: 1
+Author: 
+*************************************************************/
+void input_course(char *CourseCode)
+{
+    int index, isCorrect = 0;
+    while (1)
+    {
+        scanf("%s", CourseCode);
+        for (index = 0; CourseCode[index]!='\0'; index++) {
+            if(CourseCode[index] >= 'a' && CourseCode[index] <= 'z') {
+                isCorrect = 0;
+                printf("Please Enter valid Course Code...\n");
+                break;
+            }
+            else isCorrect = 1;
+        }
+        if(isCorrect) return;
+    }
+    
+}
 
 /************************************************************
 Function Name: fill_students
@@ -17,7 +90,8 @@ void fill_students(int *students, int size)
     for(row_counter=0;row_counter<size;row_counter++)
     {
         printf("Please enter student ID for student %d: ", row_counter+1);
-        scanf("%d", &students[row_counter]);    
+        // scanf("%d", &students[row_counter]);  
+        students[row_counter] = input_student();  
     }
 }
 
@@ -38,7 +112,8 @@ void fill_courses(char **courses, int size)
     {
         courses[course_index] = malloc(malloc_size);
         printf("Please enter course code for course %d: ", course_index+1);
-        scanf("%s", courses[course_index]);
+        input_course(courses[course_index]);
+        // scanf("%s", courses[course_index]);
     }
 }
 
@@ -61,7 +136,7 @@ void fill_registration(int **registration, int student_count, int course_count)
             registration[row_counter] = malloc(malloc_size);
             registration[row_counter][0] = student_index;
             registration[row_counter][1] = course_index;
-            registration[row_counter][2] = 0;
+            registration[row_counter][2] = -1;
             row_counter++;
         }
 }
@@ -86,6 +161,38 @@ int menu()
     
     scanf("\n%c", &choice);
     return choice;
+}
+
+/************************************************************
+Function Name: print_registration
+Purpose: Print Registration list data only values of each student as set
+Function in parameters: int[mxn], int, int
+Function out parameters: void
+Version: 1
+Author: 
+*************************************************************/
+void print_registration(int **registration, int student_count, int course_count)
+{
+    int student_index, course_index, row_index, max;
+    row_index = 0;
+    max=student_count * course_count;
+    printf("[ ");
+    for(student_index=0;student_index<student_count;student_index++)
+    {
+        printf("[");
+        for(course_index=0;course_index<course_count;course_index++)
+        {
+            // How to get -1
+            printf(" %d", registration[row_index][2]);
+            
+            if(course_index+1 < course_count)printf(",");
+            row_index++;
+        }
+        printf(" ]");
+        if(student_index+1 < student_count)printf(",");
+
+    }
+    printf(" ]\n");
 }
 
 /************************************************************
@@ -141,37 +248,6 @@ void register_modify(int *students, char **courses, int **registration, int stud
 
 }
 
-/************************************************************
-Function Name: print_registration
-Purpose: Print Registration list data only values of each student as set
-Function in parameters: int[mxn], int, int
-Function out parameters: void
-Version: 1
-Author: 
-*************************************************************/
-void print_registration(int **registration, int student_count, int course_count)
-{
-    int student_index, course_index, row_index, max;
-    row_index = 0;
-    max=student_count * course_count;
-    printf("[ ");
-    for(student_index=0;student_index<student_count;student_index++)
-    {
-        printf("[");
-        for(course_index=0;course_index<course_count;course_index++)
-        {
-            printf(" %d", registration[row_index][2]);
-            if(course_index+1 < course_count)printf(",");
-            
-            row_index++;
-        }
-        printf(" ]");
-        if(student_index+1 < student_count)printf(",");
-
-    }
-    printf(" ]\n");
-}
-
 /***************************************************************
 Function Name: main
 Purpose: Main function which runs and calls all other finctions
@@ -207,6 +283,10 @@ int main()
         switch (menu())
         {
         case '4':
+            // Empty all the data structure
+            free(students);
+            free(courses);
+            free(registration);
             return 0;
         case '3':
             print_registration(registration, student_count, course_count);
